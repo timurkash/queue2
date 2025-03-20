@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/timurkash/queue2/internal/data"
+	"github.com/timurkash/queue2/internal/biz"
 	"github.com/timurkash/queue2/internal/handler"
 )
 
@@ -13,7 +13,7 @@ type Application struct {
 }
 
 func New(cfg Config) *Application {
-	qSvc := data.New(cfg.MaxQueues, cfg.QueueCapacity)
+	qSvc := biz.New(cfg.MaxQueues, cfg.QueueCapacity)
 	theHandler := handler.New(qSvc, cfg.DefaultTimeout)
 
 	mux := http.NewServeMux()

@@ -1,4 +1,4 @@
-package data
+package biz
 
 import (
 	"context"
@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	ErrQueueFull      = errors.New("data is full")
-	ErrQueueNotExists = errors.New("data does not exist")
+	ErrQueueFull      = errors.New("biz is full")
+	ErrQueueNotExists = errors.New("biz does not exist")
 	ErrQueueLimit     = errors.New("max queues limit reached")
 	ErrTimeout        = errors.New("timeout")
 )
@@ -37,7 +37,6 @@ func New(maxQueues, queueCap int) *Service {
 func (s *Service) Put(queueName string, msg string) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
 	q, exists := s.queues[queueName]
 	if !exists {
 		if len(s.queues) >= s.maxQueues {
@@ -46,7 +45,6 @@ func (s *Service) Put(queueName string, msg string) error {
 		q = make(chan Message, s.queueCap)
 		s.queues[queueName] = q
 	}
-
 	select {
 	case q <- Message{Data: msg, Created: time.Now()}:
 		return nil
@@ -59,11 +57,9 @@ func (s *Service) Get(ctx context.Context, queueName string) (Message, error) {
 	s.mu.RLock()
 	q, exists := s.queues[queueName]
 	s.mu.RUnlock()
-
 	if !exists {
 		return Message{}, ErrQueueNotExists
 	}
-
 	select {
 	case msg := <-q:
 		return msg, nil
